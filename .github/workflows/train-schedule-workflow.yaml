@@ -38,9 +38,9 @@ jobs:
       - name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v1'
         with:
-          workload_identity_provider: 'projects/54598601140/locations/global/workloadIdentityPools/github-actions/providers/github-actions-oidc'
-          service_account: '54598601140-compute@developer.gserviceaccount.com'
-          project_id: playground-s-11-19839254
+          workload_identity_provider: 'projects/258456138807/locations/global/workloadIdentityPools/github-actions/providers/github-actions-oidc'
+          service_account: '258456138807-compute@developer.gserviceaccount.com'
+          project_id: playground-s-11-7999ef7a
           cleanup_credentials: false
       - name: Connect to GKE
         uses: google-github-actions/get-gke-credentials@v0
@@ -63,7 +63,7 @@ jobs:
   SmokeTestsOnCanaryPods:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-    needs: [BuildAndPushDockerImage, DeployCanary]
+    needs: DeployCanary
     steps:
       - name: Run Smoke Tests
         run: |
@@ -78,7 +78,7 @@ jobs:
   DeleteCanaryDeployment:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' && success() || failure()
-    needs: [BuildAndPushDockerImage, DeployCanary, SmokeTestsOnCanaryPods]
+    needs: SmokeTestsOnCanaryPods
     permissions:
      contents: 'read'
      id-token: 'write'
@@ -88,9 +88,9 @@ jobs:
       - name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v1'
         with:
-          workload_identity_provider: 'projects/54598601140/locations/global/workloadIdentityPools/github-actions/providers/github-actions-oidc'
-          service_account: '54598601140-compute@developer.gserviceaccount.com'
-          project_id: playground-s-11-19839254
+          workload_identity_provider: 'projects/258456138807/locations/global/workloadIdentityPools/github-actions/providers/github-actions-oidc'
+          service_account: '258456138807-compute@developer.gserviceaccount.com'
+          project_id: playground-s-11-7999ef7a
       - name: Connect to GKE
         uses: google-github-actions/get-gke-credentials@v0
         with:
@@ -112,7 +112,7 @@ jobs:
   DeployToKubernetesProduction:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-    needs: [BuildAndPushDockerImage, DeployCanary, DeleteCanaryDeployment]
+    needs: SmokeTestsOnCanaryPods
     environment: production
     permissions:
      contents: 'read'
@@ -123,9 +123,9 @@ jobs:
       - name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v1'
         with:
-          workload_identity_provider: 'projects/54598601140/locations/global/workloadIdentityPools/github-actions/providers/github-actions-oidc'
-          service_account: '54598601140-compute@developer.gserviceaccount.com'
-          project_id: playground-s-11-19839254
+          workload_identity_provider: 'projects/258456138807/locations/global/workloadIdentityPools/github-actions/providers/github-actions-oidc'
+          service_account: '258456138807-compute@developer.gserviceaccount.com'
+          project_id: playground-s-11-7999ef7a
       - name: Connect to GKE
         uses: google-github-actions/get-gke-credentials@v0
         with:
