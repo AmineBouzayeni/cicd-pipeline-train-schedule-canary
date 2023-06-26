@@ -1,6 +1,7 @@
 plugins {
   //inlude the nodeJS plugin to execute nodejs and npm tasks
   id "com.moowork.node" version "1.2.0"
+  id "org.sonarqube" version "4.2.1.3168"
 }
 
 node {
@@ -8,7 +9,13 @@ node {
 	version = "9.11.1"
 	npmVersion = "5.6.0"
 }
-
+sonarqube {
+  properties {
+    property "sonar.projectKey", "AmineBouzayeni_cicd-pipeline-train-schedule-canary"
+    property "sonar.organization", "aminebouzayeni"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
+}
 //declare a build task
 task build
 
