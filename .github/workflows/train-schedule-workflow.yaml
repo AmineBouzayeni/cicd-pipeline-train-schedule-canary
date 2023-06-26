@@ -67,7 +67,7 @@ jobs:
     steps:
       - name: Run Smoke Tests
         run: |
-            response=$(curl -s -o /dev/null -w "%{http_code}"  http://35.195.20.210:30081/)
+            response=$(curl -s -o /dev/null -w "%{http_code}"  http://35.233.35.115:30081/)
             if [[ $response != 200 ]]
               then
               echo "Smoke test against the canary deployment failed"
