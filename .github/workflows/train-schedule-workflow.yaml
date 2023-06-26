@@ -70,17 +70,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
-        with:
-          workload_identity_provider: 'projects/54598601140/locations/global/workloadIdentityPools/github-actions/providers/github-actions-oidc'
-          service_account: '54598601140-compute@developer.gserviceaccount.com'
-          project_id: playground-s-11-19839254
-      - name: Connect to GKE
-        uses: google-github-actions/get-gke-credentials@v0
-        with:
-          cluster_name: ${{ env.CLUSTER }}
-          location: ${{ env.CLUSTER_ZONE }}
+      # - name: 'Authenticate to Google Cloud'
+      #   uses: 'google-github-actions/auth@v1'
+      #   with:
+      #     workload_identity_provider: 'projects/54598601140/locations/global/workloadIdentityPools/github-actions/providers/github-actions-oidc'
+      #     service_account: '54598601140-compute@developer.gserviceaccount.com'
+      #     project_id: playground-s-11-19839254
+      # - name: Connect to GKE
+      #   uses: google-github-actions/get-gke-credentials@v0
+      #   with:
+      #     cluster_name: ${{ env.CLUSTER }}
+      #     location: ${{ env.CLUSTER_ZONE }}
       - name: Replace the variables in the kubernetes config file
         uses: cschleiden/replace-tokens@v1
         with:
@@ -90,6 +90,17 @@ jobs:
         env:
           DOCKER_IMAGE_NAME: mbouzayeni/train-schedule
           BUILD_NUMBER: ${{ github.sha }}
-
-      - name: Deploy to the gke cluster
+      - name: Replace the variables in the kubernetes canary config file
+        uses: cschleiden/replace-tokens@v1
+        with:
+          files: '["./train-schedule-kube-canary.yml"]'
+          tokenPrefix: __
+          tokenSuffix: __
+        env:
+          DOCKER_IMAGE_NAME: mbouzayeni/train-schedule
+          BUILD_NUMBER: ${{ github.sha }}
+          CANARY_REPLICAS: 0
+      - name: Delete the canary pods
+        run: kubectl apply -f train-schedule-kube-canary.yml
+      - name: Deploy to production
         run: kubectl apply -f train-schedule-kube.yml
