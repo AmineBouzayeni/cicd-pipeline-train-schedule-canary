@@ -5,12 +5,6 @@ env:
   CLUSTER: amineb-cluster
   CLUSTER_ZONE: europe-west1-b
 jobs:
-  name: Build
-on:
-  push:
-    branches:
-      - master
-jobs:
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
