@@ -63,7 +63,7 @@ jobs:
   SmokeTestsOnCanaryPods:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-    needs: [BuildAndPushDockerImage, DeployCanary]
+    needs: DeployCanary
     steps:
       - name: Run Smoke Tests
         run: |
@@ -78,7 +78,7 @@ jobs:
   DeleteCanaryDeployment:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' && success() || failure()
-    needs: [BuildAndPushDockerImage, DeployCanary, SmokeTestsOnCanaryPods]
+    needs: SmokeTestsOnCanaryPods
     permissions:
      contents: 'read'
      id-token: 'write'
@@ -112,7 +112,7 @@ jobs:
   DeployToKubernetesProduction:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-    needs: [BuildAndPushDockerImage, DeployCanary, DeleteCanaryDeployment]
+    needs: SmokeTestsOnCanaryPods
     environment: production
     permissions:
      contents: 'read'
