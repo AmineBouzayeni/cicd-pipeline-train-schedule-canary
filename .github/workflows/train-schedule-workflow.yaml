@@ -75,7 +75,7 @@ jobs:
   DeleteCanaryDeployment:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' && success() || failure()
-    needs: [BuildAndPushDockerImage, DeployCanary]
+    needs: [BuildAndPushDockerImage, DeployCanary, SmokeTestsOnCanaryPods]
     permissions:
      contents: 'read'
      id-token: 'write'
@@ -109,7 +109,7 @@ jobs:
   DeployToKubernetesProduction:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-    needs: [BuildAndPushDockerImage, DeployCanary]
+    needs: [BuildAndPushDockerImage, DeployCanary, DeleteCanaryDeployment]
     environment: production
     permissions:
      contents: 'read'
