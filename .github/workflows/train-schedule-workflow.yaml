@@ -69,8 +69,11 @@ jobs:
         run: |
             response=$(curl -s -o /dev/null -w "%{http_code}"  http://35.195.20.210:30081/)
             if [[ $response != 200 ]]
+              then
               echo "Smoke test against the canary deployment failed"
               exit 1
+            else
+              echo "The smoke tests were passed"  
             fi  
   DeleteCanaryDeployment:
     runs-on: ubuntu-latest
