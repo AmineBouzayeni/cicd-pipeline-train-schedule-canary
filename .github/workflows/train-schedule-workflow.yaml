@@ -5,6 +5,56 @@ env:
   CLUSTER: amineb-cluster
   CLUSTER_ZONE: europe-west1-b
 jobs:
+  CreateRelease:
+    name: Create a release
+    runs-on: ubuntu-latest
+    permissions: write-all
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: 0.2.0
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+              - Change the welcome message
+          draft: false
+          prerelease: false
+  build:
+    name: Build and analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: 'zulu' # Alternative distribution options are available
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew build sonarqube --info
   BuildAndPushDockerImage:
     runs-on: ubuntu-latest
     steps:
@@ -141,4 +191,4 @@ jobs:
           DOCKER_IMAGE_NAME: mbouzayeni/train-schedule
           BUILD_NUMBER: ${{ github.sha }}
       - name: Deploy to production
-        run: kubectl apply -f train-schedule-kube.yml
+        run: kubectl apply -f train-schedule-kube.yml      
