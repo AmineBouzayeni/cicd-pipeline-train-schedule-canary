@@ -5,6 +5,27 @@ env:
   CLUSTER: amineb-cluster
   CLUSTER_ZONE: europe-west1-b
 jobs:
+  CreateRelease:
+    name: Create a release
+    runs-on: ubuntu-latest
+    permissions: write-all
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: 0.2.0
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+              - Change the welcome message
+          draft: false
+          prerelease: false
   build:
     name: Build and analyze
     runs-on: ubuntu-latest
@@ -170,4 +191,4 @@ jobs:
           DOCKER_IMAGE_NAME: mbouzayeni/train-schedule
           BUILD_NUMBER: ${{ github.sha }}
       - name: Deploy to production
-        run: kubectl apply -f train-schedule-kube.yml
+        run: kubectl apply -f train-schedule-kube.yml      
